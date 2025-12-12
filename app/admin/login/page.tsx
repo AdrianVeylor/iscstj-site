@@ -3,25 +3,30 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-export default function AdminLoginPage() {
+export default function AdminLogin() {
   const router = useRouter();
-
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [senha, setSenha] = useState("");
   const [erro, setErro] = useState("");
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     setErro("");
 
-    const res = await fetch("/api/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
+    // LOGIN FICTÍCIO CONTROLADO
+    if (
+      (email === "admin@iscstj.com" && senha === "admin123") ||
+      (email === "secretaria@iscstj.com" && senha === "secretaria123")
+    ) {
+      // 🔐 MARCAR SESSÃO
+      localStorage.setItem(
+        "admin",
+        JSON.stringify({ email, role: email.includes("admin") ? "admin" : "secretaria" })
+      );
 
-    if (res.ok) {
-      // REDIRECIONAMENTO POR ROLE
+      document.cookie = "admin_auth=true; path=/";
+
+      // 🔁 REDIRECIONAR
       if (email.includes("admin")) {
         router.push("/admin/login/dashboard");
       } else {
@@ -33,48 +38,44 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 pt-28">
       <form
-        onSubmit={handleSubmit}
-        className="bg-white w-full max-w-md p-8 rounded-xl shadow-md"
+        onSubmit={handleLogin}
+        className="bg-white p-8 rounded-xl shadow-md w-full max-w-md"
       >
-        <h1 className="text-2xl font-bold text-blue-900 text-center mb-6">
+        <h1 className="text-2xl font-bold text-blue-900 mb-4 text-center">
           Área Administrativa
         </h1>
 
-        {erro && (
-          <p className="text-red-600 text-sm text-center mb-4">
-            {erro}
-          </p>
-        )}
+        {erro && <p className="text-red-600 mb-4 text-center">{erro}</p>}
 
         <input
           type="email"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full border p-3 rounded mb-4"
+          className="w-full mb-3 px-4 py-2 border rounded-lg"
           required
         />
 
         <input
           type="password"
-          placeholder="Senha"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full border p-3 rounded mb-6"
+          placeholder="Palavra-passe"
+          value={senha}
+          onChange={(e) => setSenha(e.target.value)}
+          className="w-full mb-4 px-4 py-2 border rounded-lg"
           required
         />
 
         <button
           type="submit"
-          className="w-full bg-blue-900 text-white py-3 rounded-lg hover:bg-blue-800 transition"
+          className="w-full bg-blue-900 text-white py-2 rounded-lg hover:bg-blue-950"
         >
           Entrar como Admin
         </button>
 
-        <p className="text-xs text-center text-gray-500 mt-4">
-          Acesso exclusivo da Secretaria / Direção
+        <p className="text-xs text-gray-500 text-center mt-4">
+          Acesso exclusivo da Direção / Secretaria
         </p>
       </form>
     </div>
