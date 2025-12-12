@@ -9,28 +9,30 @@ export default function AdminLogin() {
   const [senha, setSenha] = useState("");
   const [erro, setErro] = useState("");
 
-  async function handleLogin(e: React.FormEvent) {
+  function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     setErro("");
 
-    // LOGIN FICTÍCIO CONTROLADO
     if (
       (email === "admin@iscstj.com" && senha === "admin123") ||
       (email === "secretaria@iscstj.com" && senha === "secretaria123")
     ) {
-      // 🔐 MARCAR SESSÃO
+      // ✅ sessão persistente
       localStorage.setItem(
         "admin",
-        JSON.stringify({ email, role: email.includes("admin") ? "admin" : "secretaria" })
+        JSON.stringify({
+          email,
+          role: email.includes("admin") ? "admin" : "secretaria",
+        })
       );
 
       document.cookie = "admin_auth=true; path=/";
 
-      // 🔁 REDIRECIONAR
+      // ✅ redirecionamento FORA do /login
       if (email.includes("admin")) {
-        router.push("/admin/login/dashboard");
+        router.push("/admin/dashboard");
       } else {
-        router.push("/admin/login/secretaria");
+        router.push("/admin/secretaria");
       }
     } else {
       setErro("Credenciais inválidas.");
@@ -55,7 +57,6 @@ export default function AdminLogin() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className="w-full mb-3 px-4 py-2 border rounded-lg"
-          required
         />
 
         <input
@@ -64,18 +65,17 @@ export default function AdminLogin() {
           value={senha}
           onChange={(e) => setSenha(e.target.value)}
           className="w-full mb-4 px-4 py-2 border rounded-lg"
-          required
         />
 
         <button
           type="submit"
           className="w-full bg-blue-900 text-white py-2 rounded-lg hover:bg-blue-950"
         >
-          Entrar como Admin
+          Entrar
         </button>
 
         <p className="text-xs text-gray-500 text-center mt-4">
-          Acesso exclusivo da Direção / Secretaria
+          Direção / Secretaria
         </p>
       </form>
     </div>
