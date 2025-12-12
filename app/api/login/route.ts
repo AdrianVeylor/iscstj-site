@@ -1,47 +1,43 @@
 import { NextResponse } from "next/server";
-import { autenticarAluno } from "../../utils/auth";
 
-export async function POST(request: Request) {
-  try {
-    const body = await request.json();
-    const { numero, senha } = body ?? {};
+export async function POST(req: Request) {
+  const { email, password } = await req.json();
 
-    if (!numero || !senha) {
-      return NextResponse.json(
-        { ok: false, message: "Número de estudante e senha são obrigatórios." },
-        { status: 400 }
-      );
-    }
+  // DEMO CONTROLADA
+  if (email === "admin@iscstj.com" && password === "admin123") {
+    const user = {
+      email,
+      role: "admin",
+    };
 
-    const resultado = autenticarAluno(String(numero).trim(), String(senha).trim());
+    const res = NextResponse.json({ success: true });
 
-    if (!resultado) {
-      return NextResponse.json(
-        { ok: false, message: "Credenciais inválidas." },
-        { status: 401 }
-      );
-    }
-
-    const { aluno, token } = resultado;
-
-    const response = NextResponse.json(
-      { ok: true, aluno },
-      { status: 200 }
-    );
-
-    // Criar cookie
-    response.cookies.set("token", token, {
+    res.cookies.set("auth", JSON.stringify(user), {
+      httpOnly: true,
       path: "/",
-      httpOnly: false,   // ← enquanto testamos, deixamos false
-      maxAge: 60 * 60 * 4,
     });
 
-    return response;
-  } catch (err) {
-    console.error("Erro no /api/login:", err);
-    return NextResponse.json(
-      { ok: false, message: "Erro interno no servidor." },
-      { status: 500 }
-    );
+    return res;
   }
+
+  if (email === "secretaria@iscstj.com" && password === "secret123") {
+    const user = {
+      email,
+      role: "secretaria",
+    };
+
+    const res = NextResponse.json({ success: true });
+
+    res.cookies.set("auth", JSON.stringify(user), {
+      httpOnly: true,
+      path: "/",
+    });
+
+    return res;
+  }
+
+  return NextResponse.json(
+    { error: "Credenciais inválidas" },
+    { status: 401 }
+  );
 }
